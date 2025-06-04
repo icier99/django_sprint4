@@ -17,6 +17,7 @@ from .models import Post, User, Category, Comment
 from .forms import UserEditForm, PostEditForm, CommentEditForm
 from django import forms
 
+
 class EmptyForm(forms.Form):
     pass
 
@@ -129,7 +130,8 @@ class PostDetailView(DetailView):
         else:
             context["form"] = EmptyForm()
 
-        context["comments"] = self.object.comments.all().select_related("author")
+        comments = self.object.comments.all().select_related("author")
+        context["comments"] = comments
         return context
 
     def check_post_data(self):
