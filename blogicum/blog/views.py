@@ -331,4 +331,10 @@ class CommentDeleteView(CommentMixinView, DeleteView):
     CommentMixinView: Базовый класс, предоставляющий функциональность.
     """
 
-    ...
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return {
+            'object': context.get('object'),
+            'comment': context.get('comment'),
+            'view': self
+        }

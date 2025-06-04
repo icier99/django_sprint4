@@ -97,7 +97,6 @@ class Post(BaseModel, BaseTitle):
         null=True,
         verbose_name="Категория",
     )
-
     image = models.ImageField(
         upload_to="images",
         blank=True,
