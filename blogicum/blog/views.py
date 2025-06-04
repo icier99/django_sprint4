@@ -15,6 +15,10 @@ from core.utils import post_all_query, post_published_query, get_post_data
 from core.mixins import CommentMixinView
 from .models import Post, User, Category, Comment
 from .forms import UserEditForm, PostEditForm, CommentEditForm
+from django import forms
+
+class EmptyForm(forms.Form):
+    pass
 
 
 class MainPostListView(ListView):
@@ -118,12 +122,14 @@ class PostDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         if self.check_post_data():
             context["flag"] = True
             context["form"] = CommentEditForm()
-        context["comments"] = self.object.comments.all().select_related(
-            "author"
-        )
+        else:
+            context["form"] = EmptyForm()
+
+        context["comments"] = self.object.comments.all().select_related("author")
         return context
 
     def check_post_data(self):
