@@ -248,7 +248,7 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["form"] = PostEditForm(instance=self.object)
+        context['post'] = self.object
         return context
 
     def get_success_url(self):
