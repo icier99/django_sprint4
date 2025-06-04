@@ -34,3 +34,4 @@ class BaseTitle(models.Model):
 
     class Meta:
         abstract = True
+        

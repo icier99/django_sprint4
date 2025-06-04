@@ -2,12 +2,14 @@ from django import forms
 
 from .models import User, Post, Comment
 
+
 class UserEditForm(forms.ModelForm):
     """Форма редактирования информации о пользователе."""
 
     class Meta:
         model = User
         fields = ("first_name", "last_name", "username", "email")
+
 
 class PostEditForm(forms.ModelForm):
     """Форма редактирования поста."""

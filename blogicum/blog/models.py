@@ -55,6 +55,7 @@ class Category(BaseModel, BaseTitle):
     def __str__(self):
         return self.title
 
+
 class Post(BaseModel, BaseTitle):
     """Публикация.
 
