@@ -5,8 +5,45 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
-class Migration(migrations.Migration):
+def create_initial_data(apps, schema_editor):
+    Category = apps.get_model('blog', 'Category')
+    Location = apps.get_model('blog', 'Location')
 
+    categories = [
+        {
+            'title': 'Готовка',
+            'slug': 'cooking',
+            'description': 'Все о готовке.'
+        },
+        {
+            'title': 'Космос',
+            'slug': 'space',
+            'description': 'Про космические открытия.'
+        },
+        {
+            'title': 'Путешествия',
+            'slug': 'travel',
+            'description': 'О интересных местах.'
+        }
+    ]
+
+    for cat_data in categories:
+        Category.objects.get_or_create(
+            slug=cat_data['slug'],
+            defaults={
+                'title': cat_data['title'],
+                'description': cat_data['description'],
+                'is_published': True
+            }
+        )
+
+    Location.objects.get_or_create(
+        name='Планета Земля',
+        defaults={'is_published': True}
+    )
+
+
+class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
@@ -18,11 +55,15 @@ class Migration(migrations.Migration):
             name='Category',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_published', models.BooleanField(default=True, help_text='Снимите галочку, чтобы скрыть публикацию.', verbose_name='Опубликовано')),
+                ('is_published',
+                 models.BooleanField(default=True, help_text='Снимите галочку, чтобы скрыть публикацию.',
+                                     verbose_name='Опубликовано')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Добавлено')),
                 ('title', models.CharField(max_length=256, verbose_name='Заголовок')),
                 ('description', models.TextField(verbose_name='Описание')),
-                ('slug', models.SlugField(help_text='Идентификатор страницы для URL; разрешены символы латиницы, цифры, дефис и подчёркивание.', unique=True, verbose_name='Идентификатор')),
+                ('slug', models.SlugField(
+                    help_text='Идентификатор страницы для URL; разрешены символы латиницы, цифры, дефис и подчёркивание.',
+                    unique=True, verbose_name='Идентификатор')),
             ],
             options={
                 'verbose_name': 'категория',
@@ -34,7 +75,9 @@ class Migration(migrations.Migration):
             name='Location',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_published', models.BooleanField(default=True, help_text='Снимите галочку, чтобы скрыть публикацию.', verbose_name='Опубликовано')),
+                ('is_published',
+                 models.BooleanField(default=True, help_text='Снимите галочку, чтобы скрыть публикацию.',
+                                     verbose_name='Опубликовано')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Добавлено')),
                 ('name', models.CharField(max_length=256, verbose_name='Название места')),
             ],
@@ -48,15 +91,24 @@ class Migration(migrations.Migration):
             name='Post',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_published', models.BooleanField(default=True, help_text='Снимите галочку, чтобы скрыть публикацию.', verbose_name='Опубликовано')),
+                ('is_published',
+                 models.BooleanField(default=True, help_text='Снимите галочку, чтобы скрыть публикацию.',
+                                     verbose_name='Опубликовано')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Добавлено')),
                 ('title', models.CharField(max_length=256, verbose_name='Заголовок')),
                 ('text', models.TextField(verbose_name='Текст')),
-                ('pub_date', models.DateTimeField(help_text='Если установить дату и время в будущем — можно делать отложенные публикации.', verbose_name='Дата и время публикации')),
+                ('pub_date', models.DateTimeField(
+                    help_text='Если установить дату и время в будущем — можно делать отложенные публикации.',
+                    verbose_name='Дата и время публикации')),
                 ('image', models.ImageField(blank=True, upload_to='images', verbose_name='Изображение')),
-                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='posts', to=settings.AUTH_USER_MODEL, verbose_name='Автор публикации')),
-                ('category', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='posts', to='blog.category', verbose_name='Категория')),
-                ('location', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='posts', to='blog.location', verbose_name='Местоположение')),
+                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='posts',
+                                             to=settings.AUTH_USER_MODEL, verbose_name='Автор публикации')),
+                ('category',
+                 models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='posts',
+                                   to='blog.category', verbose_name='Категория')),
+                ('location', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
+                                               related_name='posts', to='blog.location',
+                                               verbose_name='Местоположение')),
             ],
             options={
                 'verbose_name': 'публикация',
@@ -71,8 +123,11 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('text', models.TextField(verbose_name='Комментарий')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Добавлено')),
-                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to=settings.AUTH_USER_MODEL, verbose_name='Автор')),
-                ('post', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='blog.post', verbose_name='Пост')),
+                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments',
+                                             to=settings.AUTH_USER_MODEL, verbose_name='Автор')),
+                ('post',
+                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='blog.post',
+                                   verbose_name='Пост')),
             ],
             options={
                 'verbose_name': 'комментарий',
@@ -80,5 +135,9 @@ class Migration(migrations.Migration):
                 'ordering': ('created_at',),
                 'default_related_name': 'comments',
             },
+        ),
+        migrations.RunPython(
+            create_initial_data,
+            reverse_code=migrations.RunPython.noop
         ),
     ]
